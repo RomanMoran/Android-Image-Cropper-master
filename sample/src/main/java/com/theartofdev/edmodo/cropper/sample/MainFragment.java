@@ -14,6 +14,7 @@ package com.theartofdev.edmodo.cropper.sample;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,6 +29,8 @@ import android.widget.Toast;
 import com.example.croppersample.R;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
+
+import java.util.List;
 
 /** The fragment that will show the Image Cropping UI by requested preset. */
 public final class MainFragment extends Fragment
@@ -52,7 +55,9 @@ public final class MainFragment extends Fragment
 
   /** Set the image to show for cropping. */
   public void setImageUri(Uri imageUri) {
-    mCropImageView.setImageUriAsync(imageUri);
+   /// mCropImageView.setImageUriAsync(imageUri);
+    mCropImageView.setImageUrlFromGlide("");
+
     //        CropImage.activity(imageUri)
     //                .start(getContext(), this);
   }
@@ -195,6 +200,11 @@ public final class MainFragment extends Fragment
   @Override
   public void onCropImageComplete(CropImageView view, CropImageView.CropResult result) {
     handleCropResult(result);
+  }
+
+  @Override
+  public void onMultipleCropImageComplete(CropImageView view, List<Bitmap> result) {
+
   }
 
   @Override

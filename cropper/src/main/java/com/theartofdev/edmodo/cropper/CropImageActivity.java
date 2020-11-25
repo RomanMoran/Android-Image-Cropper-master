@@ -22,17 +22,26 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.gif.GifDrawable;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Built-in activity for image cropping.<br>
@@ -80,7 +89,8 @@ public class CropImageActivity extends AppCompatActivity
             CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE);
       } else {
         // no permissions required or already grunted, can start crop image activity
-        mCropImageView.setImageUriAsync(mCropImageUri);
+        //mCropImageView.setImageUriAsync(mCropImageUri);
+        mCropImageView.setImageUrlFromGlide(Constants.GIF_SAMPLE_URL);
       }
     }
 
@@ -209,7 +219,8 @@ public class CropImageActivity extends AppCompatActivity
               CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE);
         } else {
           // no permissions required or already grunted, can start crop image activity
-          mCropImageView.setImageUriAsync(mCropImageUri);
+          //mCropImageView.setImageUriAsync(mCropImageUri);
+          mCropImageView.setImageUrlFromGlide(Constants.GIF_SAMPLE_URL);
         }
       }
     }
@@ -223,7 +234,8 @@ public class CropImageActivity extends AppCompatActivity
           && grantResults.length > 0
           && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         // required permissions granted, start crop image activity
-        mCropImageView.setImageUriAsync(mCropImageUri);
+        //mCropImageView.setImageUriAsync(mCropImageUri);
+        mCropImageView.setImageUrlFromGlide(Constants.GIF_SAMPLE_URL);
       } else {
         Toast.makeText(this, R.string.crop_image_activity_no_permissions, Toast.LENGTH_LONG).show();
         setResultCancel();
@@ -256,6 +268,11 @@ public class CropImageActivity extends AppCompatActivity
     setResult(result.getUri(), result.getError(), result.getSampleSize());
   }
 
+  @Override
+  public void onMultipleCropImageComplete(CropImageView view, List<Bitmap> result) {
+
+  }
+
   // region: Private methods
 
   /** Execute crop image and save the result tou output uri. */
@@ -264,13 +281,27 @@ public class CropImageActivity extends AppCompatActivity
       setResult(null, null, 1);
     } else {
       Uri outputUri = getOutputUri();
-      mCropImageView.saveCroppedImageAsync(
-          outputUri,
-          mOptions.outputCompressFormat,
-          mOptions.outputCompressQuality,
-          mOptions.outputRequestWidth,
-          mOptions.outputRequestHeight,
-          mOptions.outputRequestSizeOptions);
+      Glide.with(this)
+              .asGif()
+              .load(Constants.GIF_SAMPLE_URL)
+              .into(new CustomTarget<GifDrawable>() {
+                @Override
+                public void onResourceReady(@NonNull GifDrawable resource, @Nullable Transition<? super GifDrawable> transition) {
+                 ArrayList<Uri> uris = GifDrawableUtils.getUrisFromGifDrawable(CropImageActivity.this, resource);
+                    // Create method that will take array of uris
+                    mCropImageView.saveCroppedImagesAsync(
+                            uris,
+                            mOptions.outputCompressFormat,
+                            mOptions.outputCompressQuality,
+                            mOptions.outputRequestWidth,
+                            mOptions.outputRequestHeight,
+                            mOptions.outputRequestSizeOptions);
+                }
+
+                @Override
+                public void onLoadCleared(@Nullable Drawable placeholder) {
+                }
+              });
     }
   }
 

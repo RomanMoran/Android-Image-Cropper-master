@@ -21,23 +21,31 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Pair;
 
+import androidx.exifinterface.media.ExifInterface;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.gif.GifDrawable;
+
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
+import java.util.Random;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
-
-import androidx.exifinterface.media.ExifInterface;
 
 /** Utility class that deals with operations with an ImageView. */
 final class BitmapUtils {
@@ -132,6 +140,32 @@ final class BitmapUtils {
     } catch (Exception e) {
       throw new RuntimeException(
           "Failed to load sampled bitmap: " + uri + "\r\n" + e.getMessage(), e);
+    }
+  }
+
+  /** Decode bitmap from stream using sampling to get bitmap with the requested limit. */
+  static BitmapSampled decodeFromGifSampledBitmap(final Context context, final String url, int reqWidth, int reqHeight) {
+
+    try {
+      // First decode with inJustDecodeBounds=true to check dimensions
+        GifDrawable gifDrawable = Glide.with(context)
+                .asGif()
+                .load(url)
+                .submit().get();
+
+        int width = gifDrawable.getIntrinsicWidth();
+        int height = gifDrawable.getIntrinsicHeight();
+
+        if(width  == -1 && height == -1)
+            throw new RuntimeException("File is not a picture");
+
+        Bitmap bitmap = gifDrawable.getFirstFrame();
+
+        return new BitmapSampled(bitmap, 1);
+
+    } catch (Exception e) {
+      throw new RuntimeException(
+          "Failed to load sampled bitmap: " + "Gif drawable" + "\r\n" + e.getMessage(), e);
     }
   }
 
@@ -838,6 +872,29 @@ final class BitmapUtils {
     }
   }
   // endregion
+
+  public static Uri getImageUri(Context inContext, Bitmap inImage) {
+    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+    inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+    String rnd = new Random().nextInt(100000) + "Title";
+    String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, rnd, null);
+    return Uri.parse(path);
+  }
+
+  public static Bitmap uriToBitmap(Context context, Uri selectedFileUri) {
+    try {
+      ParcelFileDescriptor parcelFileDescriptor =
+              context.getContentResolver().openFileDescriptor(selectedFileUri, "r");
+      FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+      Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+
+      parcelFileDescriptor.close();
+      return image;
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+      return null;
+  }
 
   // region: Inner class: BitmapSampled
 
