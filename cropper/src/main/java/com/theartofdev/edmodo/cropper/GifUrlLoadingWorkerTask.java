@@ -111,10 +111,10 @@ final class GifUrlLoadingWorkerTask extends AsyncTask<Void, Void, GifUrlLoadingW
 
                     Bitmap bitmap = resource.getFirstFrame();
                     mBitmap = bitmap;
-                    Uri uri = BitmapUtils.getImageUri(mContext, bitmap);
+                    //Uri uri = BitmapUtils.getImageUri(mContext, bitmap);
 
                     BitmapUtils.RotateBitmapResult rotateResult =
-                            BitmapUtils.rotateBitmapByExif(decodeResult.bitmap, mContext, uri);
+                            BitmapUtils.rotateBitmapByExif(decodeResult.bitmap, mContext, null);
 
                     return new ResultGif(mUrl, bitmap, decodeResult.sampleSize, rotateResult.degrees);
                 }

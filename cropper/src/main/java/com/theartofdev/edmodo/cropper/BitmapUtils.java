@@ -77,10 +77,13 @@ final class BitmapUtils {
   static RotateBitmapResult rotateBitmapByExif(Bitmap bitmap, Context context, Uri uri) {
     ExifInterface ei = null;
     try {
-      InputStream is = context.getContentResolver().openInputStream(uri);
-      if (is != null) {
-        ei = new ExifInterface(is);
-        is.close();
+      InputStream is;
+      if (uri != null) {
+        is = context.getContentResolver().openInputStream(uri);
+        if (is != null) {
+          ei = new ExifInterface(is);
+          is.close();
+        }
       }
     } catch (Exception ignored) {
     }
