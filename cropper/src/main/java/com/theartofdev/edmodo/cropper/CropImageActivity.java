@@ -57,6 +57,9 @@ public class CropImageActivity extends AppCompatActivity
   /** Persist URI image to crop URI if specific permissions are required */
   private Uri mCropImageUri;
 
+  /** Persist Url if specific permissions are required */
+  private String mUrl;
+
   /** the options that were set for the crop image */
   private CropImageOptions mOptions;
 
@@ -70,6 +73,9 @@ public class CropImageActivity extends AppCompatActivity
 
     Bundle bundle = getIntent().getBundleExtra(CropImage.CROP_IMAGE_EXTRA_BUNDLE);
     mCropImageUri = bundle.getParcelable(CropImage.CROP_IMAGE_EXTRA_SOURCE);
+    mUrl = bundle.getString(CropImage.CROP_IMAGE_EXTRA_SOURCE_URL, "");
+    mCropImageView.setImageUrlFromGlide(mUrl);
+
     mOptions = bundle.getParcelable(CropImage.CROP_IMAGE_EXTRA_OPTIONS);
 
     if (savedInstanceState == null) {
@@ -80,7 +86,7 @@ public class CropImageActivity extends AppCompatActivity
               new String[] {Manifest.permission.CAMERA},
               CropImage.CAMERA_CAPTURE_PERMISSIONS_REQUEST_CODE);
         } else {
-          CropImage.startPickImageActivity(this);
+          //CropImage.startPickImageActivity(this);
         }
       } else if (CropImage.isReadExternalStoragePermissionsRequired(this, mCropImageUri)) {
         // request permissions and handle the result in onRequestPermissionsResult()
@@ -90,7 +96,7 @@ public class CropImageActivity extends AppCompatActivity
       } else {
         // no permissions required or already grunted, can start crop image activity
         //mCropImageView.setImageUriAsync(mCropImageUri);
-        mCropImageView.setImageUrlFromGlide(Constants.GIF_SAMPLE_URL);
+        mCropImageView.setImageUrlFromGlide(mUrl);
       }
     }
 
@@ -220,7 +226,7 @@ public class CropImageActivity extends AppCompatActivity
         } else {
           // no permissions required or already grunted, can start crop image activity
           //mCropImageView.setImageUriAsync(mCropImageUri);
-          mCropImageView.setImageUrlFromGlide(Constants.GIF_SAMPLE_URL);
+          mCropImageView.setImageUrlFromGlide(mUrl);
         }
       }
     }
@@ -235,7 +241,7 @@ public class CropImageActivity extends AppCompatActivity
           && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         // required permissions granted, start crop image activity
         //mCropImageView.setImageUriAsync(mCropImageUri);
-        mCropImageView.setImageUrlFromGlide(Constants.GIF_SAMPLE_URL);
+        mCropImageView.setImageUrlFromGlide(mUrl);
       } else {
         Toast.makeText(this, R.string.crop_image_activity_no_permissions, Toast.LENGTH_LONG).show();
         setResultCancel();
@@ -280,10 +286,9 @@ public class CropImageActivity extends AppCompatActivity
     if (mOptions.noOutputImage) {
       setResult(null, null, 1);
     } else {
-      Uri outputUri = getOutputUri();
       Glide.with(this)
               .asGif()
-              .load(Constants.GIF_SAMPLE_URL)
+              .load(mUrl)
               .into(new CustomTarget<GifDrawable>() {
                 @Override
                 public void onResourceReady(@NonNull GifDrawable resource, @Nullable Transition<? super GifDrawable> transition) {

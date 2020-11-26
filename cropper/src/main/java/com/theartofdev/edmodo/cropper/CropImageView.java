@@ -1370,7 +1370,6 @@ public class CropImageView extends FrameLayout {
         if (listener != null) {
 
             List<Bitmap> bitmaps = result.bitmaps;
-            List<Uri> uri = result.uris;
 
             listener.onMultipleCropImageComplete(this, bitmaps);
         }
@@ -1721,7 +1720,7 @@ public class CropImageView extends FrameLayout {
                     }
                     if (mLoadedImageUri == null) {
                         //setImageUriAsync(uri);
-                        setImageUrlFromGlide(Constants.GIF_SAMPLE_URL);
+                        //setImageUrlFromGlide(Constants.GIF_SAMPLE_URL);
                     }
                 } else {
                     int resId = bundle.getInt("LOADED_IMAGE_RESOURCE");
@@ -1731,7 +1730,7 @@ public class CropImageView extends FrameLayout {
                         uri = bundle.getParcelable("LOADING_IMAGE_URI");
                         if (uri != null) {
                             //setImageUriAsync(uri);
-                            setImageUrlFromGlide(Constants.GIF_SAMPLE_URL);
+                            //setImageUrlFromGlide(Constants.GIF_SAMPLE_URL);
                         }
                     }
                 }

@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.test.R;
+import com.theartofdev.edmodo.cropper.Constants;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageOptions;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -25,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
   /** Start pick image activity with chooser. */
   public void onSelectImageClick(View view) {
-    CropImage.activity(null).setGuidelines(CropImageView.Guidelines.ON).start(this);
+    CropImage.activity(null).setGuidelines(CropImageView.Guidelines.ON).start(this, Constants.GIF_SAMPLE_URL);
   }
 
   @Override

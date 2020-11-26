@@ -35,16 +35,16 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 
-import java.io.File;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+
+import java.io.File;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Helper to simplify crop image work like starting pick-image acitvity and handling camera/gallery
@@ -63,6 +63,9 @@ public final class CropImage {
 
   /** The key used to pass crop image source URI to {@link CropImageActivity}. */
   public static final String CROP_IMAGE_EXTRA_SOURCE = "CROP_IMAGE_EXTRA_SOURCE";
+
+  /** The key used to pass crop image source Url to {@link CropImageActivity}. */
+  public static final String CROP_IMAGE_EXTRA_SOURCE_URL = "CROP_IMAGE_EXTRA_SOURCE_URL";
 
   /** The key used to pass crop image options to {@link CropImageActivity}. */
   public static final String CROP_IMAGE_EXTRA_OPTIONS = "CROP_IMAGE_EXTRA_OPTIONS";
@@ -465,6 +468,11 @@ public final class CropImage {
     }
 
     /** Get {@link CropImageActivity} intent to start the activity. */
+    public Intent getIntent(@NonNull Context context, String url) {
+      return getIntent(context, url, CropImageActivity.class);
+    }
+
+    /** Get {@link CropImageActivity} intent to start the activity. */
     public Intent getIntent(@NonNull Context context, @Nullable Class<?> cls) {
       mOptions.validate();
 
@@ -477,6 +485,20 @@ public final class CropImage {
       return intent;
     }
 
+    /** Get {@link CropImageActivity} intent to start the activity. */
+    public Intent getIntent(@NonNull Context context, String urlToUpload, @Nullable Class<?> cls) {
+      mOptions.validate();
+
+      Intent intent = new Intent();
+      intent.setClass(context, cls);
+      Bundle bundle = new Bundle();
+      bundle.putParcelable(CROP_IMAGE_EXTRA_SOURCE, mSource);
+      bundle.putParcelable(CROP_IMAGE_EXTRA_OPTIONS, mOptions);
+      bundle.putString(CROP_IMAGE_EXTRA_SOURCE_URL, urlToUpload);
+      intent.putExtra(CropImage.CROP_IMAGE_EXTRA_BUNDLE, bundle);
+      return intent;
+    }
+
     /**
      * Start {@link CropImageActivity}.
      *
@@ -485,6 +507,11 @@ public final class CropImage {
     public void start(@NonNull Activity activity) {
       mOptions.validate();
       activity.startActivityForResult(getIntent(activity), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
+    }
+
+    public void start(@NonNull Activity activity, String url) {
+      mOptions.validate();
+      activity.startActivityForResult(getIntent(activity, url), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
     }
 
     /**
