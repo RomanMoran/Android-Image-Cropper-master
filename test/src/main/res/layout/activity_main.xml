@@ -1,28 +1,28 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@android:color/black">
+    android:background="@android:color/black"
+    android:orientation="vertical">
 
     <Button
+        android:id="@+id/btnStart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="12dp"
         android:onClick="onSelectImageClick"
-        android:text="Start Activity"/>
+        android:text="Start Fragment" />
 
     <ImageView
         android:id="@+id/quick_start_cropped_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"/>
+        android:layout_weight="1" />
 
-
-    <com.theartofdev.edmodo.cropper.CropOverlayView
-        android:id="@+id/cov"
-        android:layout_width="200dp"
-        android:layout_height="200dp"/>
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/btnStart" />
 
 </RelativeLayout>
