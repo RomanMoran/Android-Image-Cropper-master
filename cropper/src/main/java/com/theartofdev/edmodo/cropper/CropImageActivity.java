@@ -270,7 +270,7 @@ public class CropImageActivity extends AppCompatActivity
 
   @Override
   public void onMultipleCropImageComplete(CropImageView view, List<Bitmap> result) {
-
+    int foo = 1;
   }
 
   // region: Private methods
@@ -287,10 +287,10 @@ public class CropImageActivity extends AppCompatActivity
               .into(new CustomTarget<GifDrawable>() {
                 @Override
                 public void onResourceReady(@NonNull GifDrawable resource, @Nullable Transition<? super GifDrawable> transition) {
-                 ArrayList<Uri> uris = GifDrawableUtils.getUrisFromGifDrawable(CropImageActivity.this, resource);
+                 ArrayList<Bitmap> bitmaps = GifDrawableUtils.getBitmapsFromGifDrawable(resource);
                     // Create method that will take array of uris
                     mCropImageView.saveCroppedImagesAsync(
-                            uris,
+                            bitmaps,
                             mOptions.outputCompressFormat,
                             mOptions.outputCompressQuality,
                             mOptions.outputRequestWidth,

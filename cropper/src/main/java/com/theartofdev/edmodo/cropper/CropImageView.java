@@ -1039,7 +1039,7 @@ public class CropImageView extends FrameLayout {
     }
 
     public void saveCroppedImagesAsync(
-            List<Uri> saveUris,
+            List<Bitmap> bitmaps,
             Bitmap.CompressFormat saveCompressFormat,
             int saveCompressQuality,
             int reqWidth,
@@ -1049,7 +1049,7 @@ public class CropImageView extends FrameLayout {
             throw new IllegalArgumentException("mOnCropImageCompleteListener is not set");
         }
         startCropWorkerTaskForManyUris(
-                reqWidth, reqHeight, options, saveUris, saveCompressFormat, saveCompressQuality);
+                reqWidth, reqHeight, options, bitmaps, saveCompressFormat, saveCompressQuality);
     }
 
     /**
@@ -1575,7 +1575,7 @@ public class CropImageView extends FrameLayout {
             int reqWidth,
             int reqHeight,
             RequestSizeOptions options,
-            List<Uri> saveUris,
+            List<Bitmap> saveBitmaps,
             Bitmap.CompressFormat saveCompressFormat,
             int saveCompressQuality) {
         Bitmap bitmap = mBitmap;
@@ -1613,7 +1613,7 @@ public class CropImageView extends FrameLayout {
                                         mFlipHorizontally,
                                         mFlipVertically,
                                         options,
-                                        saveUris,
+                                        saveBitmaps,
                                         saveCompressFormat,
                                         saveCompressQuality));
             } else {
@@ -1632,7 +1632,7 @@ public class CropImageView extends FrameLayout {
                                         mFlipHorizontally,
                                         mFlipVertically,
                                         options,
-                                        saveUris,
+                                        saveBitmaps,
                                         saveCompressFormat,
                                         saveCompressQuality));
             }

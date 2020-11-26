@@ -112,7 +112,7 @@ final class MultipleBitmapCroppingWorkerTask
     /**
      * the Android Uri to save the cropped image to
      */
-    private final List<Uri> mSaveUris;
+    private final List<Bitmap> mSavedBitmaps;
 
     /**
      * the compression format to use when writing the image
@@ -138,7 +138,7 @@ final class MultipleBitmapCroppingWorkerTask
             boolean flipHorizontally,
             boolean flipVertically,
             CropImageView.RequestSizeOptions options,
-            List<Uri> saveUris,
+            List<Bitmap> savedBitmaps,
             Bitmap.CompressFormat saveCompressFormat,
             int saveCompressQuality) {
 
@@ -156,7 +156,7 @@ final class MultipleBitmapCroppingWorkerTask
         mFlipHorizontally = flipHorizontally;
         mFlipVertically = flipVertically;
         mReqSizeOptions = options;
-        mSaveUris = saveUris;
+        mSavedBitmaps = savedBitmaps;
         mSaveCompressFormat = saveCompressFormat;
         mSaveCompressQuality = saveCompressQuality;
         mOrgWidth = 0;
@@ -178,7 +178,7 @@ final class MultipleBitmapCroppingWorkerTask
             boolean flipHorizontally,
             boolean flipVertically,
             CropImageView.RequestSizeOptions options,
-            List<Uri> saveUris,
+            List<Bitmap> savedBitmaps,
             Bitmap.CompressFormat saveCompressFormat,
             int saveCompressQuality) {
 
@@ -197,7 +197,7 @@ final class MultipleBitmapCroppingWorkerTask
         mFlipHorizontally = flipHorizontally;
         mFlipVertically = flipVertically;
         mReqSizeOptions = options;
-        mSaveUris = saveUris;
+        mSavedBitmaps = savedBitmaps;
         mSaveCompressFormat = saveCompressFormat;
         mSaveCompressQuality = saveCompressQuality;
         mBitmap = null;
@@ -223,9 +223,8 @@ final class MultipleBitmapCroppingWorkerTask
                 ArrayList<Bitmap> bitmaps = new ArrayList<>();
                 ArrayList<Uri> uris = new ArrayList<>();
                 BitmapUtils.BitmapSampled bitmapSampled = null;
-                for (int i = 0; i < mSaveUris.size(); i++) {
-                    Uri mUri = mSaveUris.get(i);
-                    Bitmap mBitmap = BitmapUtils.uriToBitmap(mContext, mUri);
+                for (int i = 0; i < mSavedBitmaps.size(); i++) {
+                    Bitmap mBitmap = mSavedBitmaps.get(i);
                     if (mUri != null) {
                         bitmapSampled =
                                 BitmapUtils.cropBitmap(
@@ -260,7 +259,7 @@ final class MultipleBitmapCroppingWorkerTask
                     Bitmap bitmap =
                             BitmapUtils.resizeBitmap(bitmapSampled.bitmap, mReqWidth, mReqHeight, mReqSizeOptions);
 
-                    if (mBitmap == null) {
+                    if (mBitmap != null && bitmap != null) {
                         bitmaps.add(bitmap);
                     } else {
                         BitmapUtils.writeBitmapToUri(
@@ -276,7 +275,7 @@ final class MultipleBitmapCroppingWorkerTask
             }
             return null;
         } catch (Exception e) {
-            return new Result(e, mSaveUris != null);
+            return new Result(e, mSavedBitmaps != null);
         }
     }
 
