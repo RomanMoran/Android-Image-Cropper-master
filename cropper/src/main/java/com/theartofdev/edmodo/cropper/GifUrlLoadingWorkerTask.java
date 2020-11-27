@@ -100,16 +100,14 @@ final class GifUrlLoadingWorkerTask extends AsyncTask<Void, Void, GifUrlLoadingW
 
                 if (!isCancelled()) {
 
-                    GifDrawable resource = Glide.with(mContext)
-                            .asGif()
-                            .load(mUrl).submit().get();
-                    int w = resource.getIntrinsicWidth();
-                    int h = resource.getIntrinsicHeight();
+                    ImageMetadata imageMetadata = ImageLoader.loadUrlAndMetadataImmediately(mContext, mUrl);
+                    int w = imageMetadata.getWidth();
+                    int h = imageMetadata.getHeight();
 
                     final BitmapUtils.BitmapSampled decodeResult =
                             BitmapUtils.decodeFromGifSampledBitmap(mContext, mUrl, w, h);
 
-                    Bitmap bitmap = resource.getFirstFrame();
+                    Bitmap bitmap = imageMetadata.getBitmap();
                     mBitmap = bitmap;
                     //Uri uri = BitmapUtils.getImageUri(mContext, bitmap);
 

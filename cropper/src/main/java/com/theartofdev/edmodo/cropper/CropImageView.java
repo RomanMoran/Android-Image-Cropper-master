@@ -21,12 +21,12 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,14 +35,10 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.exifinterface.media.ExifInterface;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.gif.GifDrawable;
-import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.transition.Transition;
+import com.bumptech.glide.request.target.Target;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -1412,41 +1408,18 @@ public class CropImageView extends FrameLayout {
 
             clearImageInt();
 
-            //mBitmap = bitmap;
-            //mImageView.setImageBitmap(mBitmap);
-
             mLoadedImageUrl = imageUrl;
-            Glide.with(this).asGif()
-                    .load(imageUrl)
-                    .into(new CustomTarget<GifDrawable>() {
-                        @Override
-                        public void onResourceReady(@NonNull GifDrawable resource, @Nullable Transition<? super GifDrawable> transition) {
-                            Bitmap bitmap = resource.getFirstFrame();
-                            //Uri imageUri = BitmapUtils.getImageUri(getContext(), bitmap);
-                            setBitmap(resource.getFirstFrame(), 0, null, loadSampleSize, degreesRotated);
-                            Glide.with(getContext())
-                                    .asGif()
-                                    .load(imageUrl)
-                                    .into(mImageView);
-                            /*mLoadedSampleSize = loadSampleSize;
-                            mDegreesRotated = degreesRotated;
-
-                            applyImageMatrix(getWidth(), getHeight(), true, false);
-
-                            if (mCropOverlayView != null) {
-                                mCropOverlayView.resetCropOverlayView();
-                                setCropOverlayVisibility();
-                            }*/
-                        }
-
-                        @Override
-                        public void onLoadCleared(@Nullable Drawable placeholder) {
-
-                        }
-                    });
-
-      /*mLoadedImageUri = imageUri;
-      mImageResource = imageResource;*/
+            ImageLoader.loadUrlAndMetadata(this, imageUrl, new ImageLoader.ImageMetadataListener() {
+                @Override
+                public void onImageLoaded(ImageMetadata imageMetadata) {
+                    Log.d("TAGAGA", "DADASDADASdsa");
+                    setBitmap(imageMetadata.getBitmap(), 0, null, loadSampleSize, degreesRotated);
+                    Glide.with(getContext())
+                            .load(imageUrl)
+                            .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                            .into(mImageView);
+                }
+            });
         }
     }
 

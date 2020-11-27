@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,14 +34,65 @@ public class ImageLoader {
         void onImageLoaded(ImageMetadata imageMetadata);
     }
 
-    public static void loadUrl(Context context, String url, final ImageMetadataListener imageMetadataListener) {
+
+    public static ImageMetadata loadUrlAndMetadataImmediately(View view, String url) {
+        RequestManager requestManager = Glide.with(view);
+        return loadUrlAndMetadataImmediately(url, requestManager);
+    }
+
+    public static ImageMetadata loadUrlAndMetadataImmediately(Context context, String url) {
+        RequestManager requestManager = Glide.with(context);
+        return loadUrlAndMetadataImmediately(url, requestManager);
+    }
+
+    private static ImageMetadata loadUrlAndMetadataImmediately(String url, RequestManager requestManager) {
         String fileType = "";
         int lastIndexOfPoint = url.lastIndexOf(".");
         if (lastIndexOfPoint > 0) {
             fileType = url.substring(lastIndexOfPoint + 1);
         }
 
+        try {
+            if (fileType.equals("gif")) {
+                GifDrawable gifDrawable = requestManager.asGif()
+                        .load(url)
+                        .submit().get();
+                return new ImageMetadata(gifDrawable.getFirstFrame(), gifDrawable.getIntrinsicWidth(), gifDrawable.getIntrinsicHeight());
+
+            } else if (fileType.equals("webp")) {
+                WebpDrawable webpDrawable = (WebpDrawable) requestManager.asDrawable()
+                        .optionalTransform(WebpDrawable.class, new WebpDrawableTransformation(new CircleCrop()))
+                        .load(url)
+                        .submit().get();
+                return new ImageMetadata(webpDrawable.getFirstFrame(), webpDrawable.getIntrinsicWidth(), webpDrawable.getIntrinsicHeight());
+            } else {
+                Bitmap bitmap = requestManager.asBitmap()
+                        .load(url)
+                        .submit().get();
+                return new ImageMetadata(bitmap, bitmap.getWidth(), bitmap.getHeight());
+            }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static void loadUrlAndMetadata(View view, String url, final ImageMetadataListener imageMetadataListener) {
+        RequestManager requestManager = Glide.with(view);
+        loadUrlAndMetadata(url, requestManager, imageMetadataListener);
+
+    }
+
+    public static void loadUrlAndMetadata(Context context, String url, final ImageMetadataListener imageMetadataListener) {
         RequestManager requestManager = Glide.with(context);
+        loadUrlAndMetadata(url, requestManager, imageMetadataListener);
+    }
+
+    private static void loadUrlAndMetadata(String url, RequestManager requestManager, final ImageMetadataListener imageMetadataListener) {
+        String fileType = "";
+        int lastIndexOfPoint = url.lastIndexOf(".");
+        if (lastIndexOfPoint > 0) {
+            fileType = url.substring(lastIndexOfPoint + 1);
+        }
 
         if (fileType.equals("gif")) {
             requestManager.asGif();
@@ -69,14 +121,23 @@ public class ImageLoader {
                 }));
     }
 
-    public static void loadUrl(Context context, String url, ImageLoaderListener imageLoaderListener) {
+    public static void loadUrl(View view, String url, final ImageLoaderListener imageMetadataListener) {
+        RequestManager requestManager = Glide.with(view);
+        loadUrl(url, requestManager, imageMetadataListener);
+
+    }
+
+    public static void loadUrl(Context context, String url, final ImageLoaderListener imageMetadataListener) {
+        RequestManager requestManager = Glide.with(context);
+        loadUrl(url, requestManager, imageMetadataListener);
+    }
+
+    private static void loadUrl(String url, RequestManager requestManager, ImageLoaderListener imageLoaderListener) {
         String fileType = "";
         int lastIndexOfPoint = url.lastIndexOf(".");
         if (lastIndexOfPoint > 0) {
             fileType = url.substring(lastIndexOfPoint + 1);
         }
-
-        RequestManager requestManager = Glide.with(context);
 
         if (fileType.equals("gif")) {
             requestManager.asGif();

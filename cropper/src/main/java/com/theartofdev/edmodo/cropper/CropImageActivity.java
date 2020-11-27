@@ -28,19 +28,17 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.bumptech.glide.Glide;
+import com.bumptech.glide.integration.webp.decoder.WebpDrawable;
 import com.bumptech.glide.load.resource.gif.GifDrawable;
-import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.transition.Transition;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -286,27 +284,43 @@ public class CropImageActivity extends AppCompatActivity
     if (mOptions.noOutputImage) {
       setResult(null, null, 1);
     } else {
-      Glide.with(this)
-              .asGif()
-              .load(mUrl)
-              .into(new CustomTarget<GifDrawable>() {
-                @Override
-                public void onResourceReady(@NonNull GifDrawable resource, @Nullable Transition<? super GifDrawable> transition) {
-                 ArrayList<Bitmap> bitmaps = GifDrawableUtils.getBitmapsFromGifDrawable(resource);
-                    // Create method that will take array of uris
-                    mCropImageView.saveCroppedImagesAsync(
-                            bitmaps,
-                            mOptions.outputCompressFormat,
-                            mOptions.outputCompressQuality,
-                            mOptions.outputRequestWidth,
-                            mOptions.outputRequestHeight,
-                            mOptions.outputRequestSizeOptions);
-                }
+      ImageLoader.loadUrl(this, mUrl, new ImageLoader.ImageLoaderListener() {
+        @Override
+        public void onLoadedGifDrawable(GifDrawable gifDrawable) {
+            ArrayList<Bitmap> bitmaps = GifDrawableUtils.getBitmapsFromGifDrawable(gifDrawable);
+            mCropImageView.saveCroppedImagesAsync(
+                    bitmaps,
+                    mOptions.outputCompressFormat,
+                    mOptions.outputCompressQuality,
+                    mOptions.outputRequestWidth,
+                    mOptions.outputRequestHeight,
+                    mOptions.outputRequestSizeOptions);
+        }
 
-                @Override
-                public void onLoadCleared(@Nullable Drawable placeholder) {
-                }
-              });
+        @Override
+        public void onLoadedDrawable(Bitmap bitmap) {
+            ArrayList<Bitmap> bitmaps = (ArrayList<Bitmap>) Arrays.asList(bitmap);
+            mCropImageView.saveCroppedImagesAsync(
+                    bitmaps,
+                    mOptions.outputCompressFormat,
+                    mOptions.outputCompressQuality,
+                    mOptions.outputRequestWidth,
+                    mOptions.outputRequestHeight,
+                    mOptions.outputRequestSizeOptions);
+        }
+
+        @Override
+        public void onLoadedWebpDrawable(WebpDrawable webpDrawable) {
+            ArrayList<Bitmap> bitmaps = GifDrawableUtils.getBitmapsFromGifDrawable(webpDrawable);
+            mCropImageView.saveCroppedImagesAsync(
+                    bitmaps,
+                    mOptions.outputCompressFormat,
+                    mOptions.outputCompressQuality,
+                    mOptions.outputRequestWidth,
+                    mOptions.outputRequestHeight,
+                    mOptions.outputRequestSizeOptions);
+        }
+      });
     }
   }
 

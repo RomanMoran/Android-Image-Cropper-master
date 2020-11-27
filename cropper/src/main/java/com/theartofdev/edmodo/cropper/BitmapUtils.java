@@ -151,18 +151,16 @@ final class BitmapUtils {
 
     try {
       // First decode with inJustDecodeBounds=true to check dimensions
-        GifDrawable gifDrawable = Glide.with(context)
-                .asGif()
-                .load(url)
-                .submit().get();
 
-        int width = gifDrawable.getIntrinsicWidth();
-        int height = gifDrawable.getIntrinsicHeight();
+        ImageMetadata imageMetadata = ImageLoader.loadUrlAndMetadataImmediately(context, url);
+
+        int width = imageMetadata.getWidth();
+        int height = imageMetadata.getHeight();
 
         if(width  == -1 && height == -1)
             throw new RuntimeException("File is not a picture");
 
-        Bitmap bitmap = gifDrawable.getFirstFrame();
+        Bitmap bitmap = imageMetadata.getBitmap();
 
         return new BitmapSampled(bitmap, 1);
 

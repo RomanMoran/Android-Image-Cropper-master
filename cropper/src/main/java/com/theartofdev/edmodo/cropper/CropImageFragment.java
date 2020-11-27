@@ -1,7 +1,6 @@
 package com.theartofdev.edmodo.cropper;
 
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,12 +12,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.bumptech.glide.Glide;
+import com.bumptech.glide.integration.webp.decoder.WebpDrawable;
 import com.bumptech.glide.load.resource.gif.GifDrawable;
-import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.transition.Transition;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -99,27 +97,43 @@ public class CropImageFragment extends Fragment implements CropImageView.OnSetIm
         if (mOptions.noOutputImage) {
             //setResult(null, null, 1);
         } else {
-            Glide.with(this)
-                    .asGif()
-                    .load(mUrl)
-                    .into(new CustomTarget<GifDrawable>() {
-                        @Override
-                        public void onResourceReady(@NonNull GifDrawable resource, @Nullable Transition<? super GifDrawable> transition) {
-                            ArrayList<Bitmap> bitmaps = GifDrawableUtils.getBitmapsFromGifDrawable(resource);
-                            // Create method that will take array of uris
-                            mCropImageView.saveCroppedImagesAsync(
-                                    bitmaps,
-                                    mOptions.outputCompressFormat,
-                                    mOptions.outputCompressQuality,
-                                    mOptions.outputRequestWidth,
-                                    mOptions.outputRequestHeight,
-                                    mOptions.outputRequestSizeOptions);
-                        }
+            ImageLoader.loadUrl(requireContext(), mUrl, new ImageLoader.ImageLoaderListener() {
+                @Override
+                public void onLoadedGifDrawable(GifDrawable gifDrawable) {
+                    ArrayList<Bitmap> bitmaps = GifDrawableUtils.getBitmapsFromGifDrawable(gifDrawable);
+                    mCropImageView.saveCroppedImagesAsync(
+                            bitmaps,
+                            mOptions.outputCompressFormat,
+                            mOptions.outputCompressQuality,
+                            mOptions.outputRequestWidth,
+                            mOptions.outputRequestHeight,
+                            mOptions.outputRequestSizeOptions);
+                }
 
-                        @Override
-                        public void onLoadCleared(@Nullable Drawable placeholder) {
-                        }
-                    });
+                @Override
+                public void onLoadedDrawable(Bitmap bitmap) {
+                    ArrayList<Bitmap> bitmaps = new ArrayList<>(Arrays.asList(bitmap));
+                    mCropImageView.saveCroppedImagesAsync(
+                            bitmaps,
+                            mOptions.outputCompressFormat,
+                            mOptions.outputCompressQuality,
+                            mOptions.outputRequestWidth,
+                            mOptions.outputRequestHeight,
+                            mOptions.outputRequestSizeOptions);
+                }
+
+                @Override
+                public void onLoadedWebpDrawable(WebpDrawable webpDrawable) {
+                    ArrayList<Bitmap> bitmaps = GifDrawableUtils.getBitmapsFromGifDrawable(webpDrawable);
+                    mCropImageView.saveCroppedImagesAsync(
+                            bitmaps,
+                            mOptions.outputCompressFormat,
+                            mOptions.outputCompressQuality,
+                            mOptions.outputRequestWidth,
+                            mOptions.outputRequestHeight,
+                            mOptions.outputRequestSizeOptions);
+                }
+            });
         }
     }
 
