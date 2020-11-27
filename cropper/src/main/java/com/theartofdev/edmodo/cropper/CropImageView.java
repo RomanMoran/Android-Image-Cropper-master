@@ -1416,10 +1416,6 @@ public class CropImageView extends FrameLayout {
             //mImageView.setImageBitmap(mBitmap);
 
             mLoadedImageUrl = imageUrl;
-            /*Glide.with(this)
-                    .asGif()
-                    .load(imageUrl)
-                    .into(mImageView);*/
             Glide.with(this).asGif()
                     .load(imageUrl)
                     .into(new CustomTarget<GifDrawable>() {
